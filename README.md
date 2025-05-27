@@ -1,4 +1,18 @@
-**SeimTrix** is an innovative **SIEM log analyzer** and **cybersecurity tool** designed to monitor, analyze, and visualize user activity from **browser histories**, **Windows logs**, and application usage. It delivers a powerful, **beautifully designed dashboard** that tracks **productivity** by measuring time spent on coding platforms like **LeetCode**, **GitHub**, and **VS Code**, while also monitoring distractions such as **Netflix** and social media. With advanced **security insights**, real-time alerts, and behavioral analysis, SeimTrix helps users improve focus, identify potential security risks, and optimize time management through clear, actionable reports and personalized recommendations.
+SeimTrix is a modern SIEM (Security Information and Event Management) web application designed to collect, analyze, and visualize system and user activity logs across endpoints and networks. It integrates logs from browsers, system events, email clients, and applications to detect suspicious behavior, track access patterns, and provide actionable security insights in real time.
+
+SeimTrix offers:
+
+📊 A unified dashboard to correlate events from Chrome, Outlook, Windows, and other sources
+
+⚠️ Customizable alert rules to flag anomalies and potential breaches
+
+🧠 Lightweight behavioral analytics to identify insider threats or unusual patterns
+
+🛡️ Support for log formats like JSONL, with structured ingestion via a centralized Flask-based server
+
+⏱️ Optional user activity categorization to support security auditing or productivity reviews (e.g., coding vs. entertainment)
+
+With real-time monitoring, historical log search, and modular agent support, SeimTrix empowers cybersecurity analysts, IT admins, and developers to secure their systems and gain full visibility into digital activity — all through a clean, web-accessible interface.
 
 
 
