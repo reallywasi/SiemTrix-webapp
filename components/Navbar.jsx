@@ -1,459 +1,129 @@
-// "use client";
-
-// import Link from "next/link";
-// import { signIn, signOut, useSession } from "next-auth/react";
-
-// export default function Navbar() {
-//   const { status } = useSession();
-//   return (
-//     <div className="p-4 flex justify-between items-center shadow-md">
-//       <Link className="font-bold text-lg text-blue-700" href={"/"}>
-//         GitBit
-//       </Link>
-//       {status === "authenticated" ? (
-//         <button
-//           onClick={() => signOut()}
-//           className="bg-slate-900 text-white px-6 py-2 rounded-md"
-//         >
-//           Sign Out
-//         </button>
-//       ) : (
-//         <button
-//           onClick={() => signIn("google")}
-//           className="bg-slate-900 text-white px-6 py-2 rounded-md"
-//         >
-//           Sign In
-//         </button>
-//       )}
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import Link from "next/link";
-// import { signIn, signOut, useSession } from "next-auth/react";
-// import { useState } from "react";
-// import { AiOutlineMenu } from "react-icons/ai";
-
-// export default function Navbar() {
-//   const { status } = useSession();
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   const toggleMenu = () => {
-//     setIsOpen(!isOpen);
-//   };
-
-//   return (
-//     <div className="p-4 flex justify-between items-center shadow-md bg-white">
-//       <Link className="font-bold text-lg text-blue-700" href={"/"}>
-//         GitBit
-//       </Link>
-
-//       {/* Desktop Navigation */}
-//       <div className="hidden md:flex space-x-6 items-center">
-//         {status === "authenticated" && (
-//           <>
-//             <Link href="/profile" className="text-gray-700 hover:text-blue-700">
-//               Profile
-//             </Link>
-//             <Link href="/tests" className="text-gray-700 hover:text-blue-700">
-//               Tests
-//             </Link>
-//             <Link href="/results" className="text-gray-700 hover:text-blue-700">
-//               Results
-//             </Link>
-//             <Link href="/upcoming-tests" className="text-gray-700 hover:text-blue-700">
-//               Upcoming Tests
-//             </Link>
-//             <Link href="/rankings" className="text-gray-700 hover:text-blue-700">
-//               Rankings
-//             </Link>
-//             <button
-//               onClick={() => signOut()}
-//               className="bg-slate-900 text-white px-4 py-2 rounded-md"
-//             >
-//               Sign Out
-//             </button>
-//           </>
-//         )}
-
-//         {status !== "authenticated" && (
-//           <button
-//             onClick={() => signIn("google")}
-//             className="bg-slate-900 text-white px-4 py-2 rounded-md"
-//           >
-//             Sign In
-//           </button>
-//         )}
-//       </div>
-
-//       {/* Mobile Menu Icon */}
-//       <div className="md:hidden flex items-center">
-//         <button onClick={toggleMenu} className="text-slate-900">
-//           <AiOutlineMenu size={24} />
-//         </button>
-//       </div>
-
-//       {/* Mobile Navigation Menu */}
-//       {isOpen && (
-//         <div className="md:hidden fixed inset-0 bg-white flex flex-col justify-center items-center z-10">
-//           <ul className="flex flex-col p-4 space-y-6">
-//             {status === "authenticated" && (
-//               <>
-//                 <li>
-//                   <Link
-//                     href="/profile"
-//                     className="text-gray-700 text-xl hover:text-blue-700"
-//                     onClick={toggleMenu}
-//                   >
-//                     Profile
-//                   </Link>
-//                 </li>
-//                 <li>
-//                   <Link
-//                     href="/tests"
-//                     className="text-gray-700 text-xl hover:text-blue-700"
-//                     onClick={toggleMenu}
-//                   >
-//                     Tests
-//                   </Link>
-//                 </li>
-//                 <li>
-//                   <Link
-//                     href="/results"
-//                     className="text-gray-700 text-xl hover:text-blue-700"
-//                     onClick={toggleMenu}
-//                   >
-//                     Results
-//                   </Link>
-//                 </li>
-//                 <li>
-//                   <Link
-//                     href="/upcoming-tests"
-//                     className="text-gray-700 text-xl hover:text-blue-700"
-//                     onClick={toggleMenu}
-//                   >
-//                     Upcoming Tests
-//                   </Link>
-//                 </li>
-//                 <li>
-//                   <Link
-//                     href="/rankings"
-//                     className="text-gray-700 text-xl hover:text-blue-700"
-//                     onClick={toggleMenu}
-//                   >
-//                     Rankings
-//                   </Link>
-//                 </li>
-//                 <li>
-//                   <button
-//                     onClick={() => {
-//                       signOut();
-//                       toggleMenu();
-//                     }}
-//                     className="bg-slate-900 text-white text-xl px-4 py-2 rounded-md w-full"
-//                   >
-//                     Sign Out
-//                   </button>
-//                 </li>
-//               </>
-//             )}
-
-//             {status !== "authenticated" && (
-//               <li>
-//                 <button
-//                   onClick={() => {
-//                     signIn("google");
-//                     toggleMenu();
-//                   }}
-//                   className="bg-slate-900 text-white text-xl px-4 py-2 rounded-md w-full"
-//                 >
-//                   Sign In
-//                 </button>
-//               </li>
-//             )}
-//           </ul>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "use client";
-import { FaGoogle } from 'react-icons/fa';
 
-import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { useState } from "react";
-import { AiOutlineMenu } from "react-icons/ai";
+import { FaGoogle } from "react-icons/fa";
 
 export default function Navbar() {
   const { status } = useSession();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
+
+  const sections = [
+    "features",
+    "how-it-works",
+    "security",
+    "dashboard-preview",
+    "pricing",
+    "contact",
+  ];
 
   return (
-<div className="relative px-4 py-1 flex justify-between items-center shadow-md bg-black z-30 border-b border-gray-700"> 
-<div className="flex items-center"> {/* Added flex to align items side by side */}
-    <Link className="font-bold text-lg text-blue-700" href={"/"}>
-      <img
-        src="https://i.ibb.co/8rQdq0P/your-logo.png" // Replace this URL with your logo URL
-        alt="Logo"
-        className="w-16 h-auto" // You can adjust the width and height accordingly
-      />
-    </Link>
-    <div className="text-white ml-2"> {/* Added margin-left to add space between the logo and text */}
-      Wings
-    </div>
-  </div>
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex space-x-6 items-center">
-        {status === "authenticated" && (
-          <>
-           
+    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white shadow-md">
+      <div className="flex justify-between items-center h-16">
+        {/* Logo */}
+        <div className="flex-shrink-0">
+          <a href="#" className="text-2xl font-bold text-slate-900">
+            SiemTrix
+          </a>
+        </div>
+
+        {/* Desktop Nav Links */}
+        <div className="hidden md:flex space-x-8">
+          {sections.map((section) => (
+            <a
+              key={section}
+              href={`#${section}`}
+              className="text-gray-700 hover:text-emerald-600 transition-colors duration-300 font-medium"
+            >
+              {section.charAt(0).toUpperCase() + section.slice(1).replace("-", " ")}
+            </a>
+          ))}
+        </div>
+
+        {/* Desktop Auth Button */}
+        <div className="hidden md:flex">
+          {status === "authenticated" ? (
             <button
               onClick={() => signOut()}
-              className="bg-slate-900 text-white px-4 py-2 rounded-md"
+              className="bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-all"
             >
               Sign Out
             </button>
-          </>
-        )}
-
-        {status !== "authenticated" && (
-          <button
-  onClick={() => signIn("google")}
-  className="flex items-center bg-white text-slate-900 border border-gray-300 px-6 py-3 rounded-md hover:bg-gray-100 hover:text-black transition-all"
->
-  <FaGoogle className="mr-3 text-lg" />
-  Sign In with Google
-</button>
-        )}
-      </div>
-
-      {/* Mobile Menu Icon */}
-      <div className="md:hidden flex items-center z-40">
-        <button onClick={toggleMenu} className="text-slate-900">
-          <AiOutlineMenu size={24} />
-        </button>
-      </div>
-
-      {/* Overlay for Mobile Menu */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-20" onClick={toggleMenu}></div>
-      )}
-
-      {/* Mobile Navigation Menu */}
-      {isOpen && (
-        <div className="fixed top-0 right-0 h-full bg-white w-1/2 shadow-lg z-30 flex flex-col p-4">
-          <div className="flex justify-end mb-4">
-            <button onClick={toggleMenu} className="text-slate-900">
-              <AiOutlineMenu size={24} />
+          ) : (
+            <button
+              onClick={() => signIn("google")}
+              className="flex items-center bg-white text-slate-900 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-all"
+            >
+              <FaGoogle className="mr-2 text-lg" />
+              Sign In with Google
             </button>
-          </div>
-          <ul className="flex flex-col space-y-6">
-            {status === "authenticated" && (
-              <>
-                <li>
-                  <Link
-                    href="/profile"
-                    className="text-gray-700 text-xl hover:text-blue-700 block px-4 py-2 rounded-md"
-                    onClick={toggleMenu}
-                  >
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/tests"
-                    className="text-gray-700 text-xl hover:text-blue-700 block px-4 py-2 rounded-md"
-                    onClick={toggleMenu}
-                  >
-                    Tests
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/results"
-                    className="text-gray-700 text-xl hover:text-blue-700 block px-4 py-2 rounded-md"
-                    onClick={toggleMenu}
-                  >
-                    Results
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/upcomingtests"
-                    className="text-gray-700 text-xl hover:text-blue-700 block px-4 py-2 rounded-md"
-                    onClick={toggleMenu}
-                  >
-                    Upcoming Tests
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/rankings"
-                    className="text-gray-700 text-xl hover:text-blue-700 block px-4 py-2 rounded-md"
-                    onClick={toggleMenu}
-                  >
-                    Rankings
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    onClick={() => {
-                      signOut();
-                      toggleMenu();
-                    }}
-                    className="bg-slate-900 text-white text-xl px-4 py-2 rounded-md w-full"
-                  >
-                    Sign Out
-                  </button>
-                </li>
-              </>
-            )}
-
-            {status !== "authenticated" && (
-              <li>
-                <button
-                  onClick={() => {
-                    signIn("google");
-                    toggleMenu();
-                  }}
-                  className="bg-slate-900 text-white text-xl px-4 py-2 rounded-md w-full"
-                >
-                  Sign In
-                </button>
-              </li>
-            )}
-          </ul>
+          )}
         </div>
-      )}
-    </div>
+
+        {/* Mobile Menu Toggle */}
+        <div className="md:hidden">
+          <button
+            onClick={toggleMobileMenu}
+            className="text-gray-700 hover:text-emerald-600 transition-colors duration-300"
+            aria-label="Toggle navigation menu"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d={
+                  isMobileMenuOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16M4 18h16"
+                }
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div className={`md:hidden ${isMobileMenuOpen ? "" : "hidden"}`}>
+        <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
+          {sections.map((section) => (
+            <a
+              key={section}
+              href={`#${section}`}
+              onClick={closeMobileMenu}
+              className="block px-3 py-2 text-gray-700 hover:text-emerald-600 hover:bg-gray-50 transition-colors duration-300 font-medium"
+            >
+              {section.charAt(0).toUpperCase() + section.slice(1).replace("-", " ")}
+            </a>
+          ))}
+
+          {status === "authenticated" ? (
+            <button
+              onClick={() => {
+                signOut();
+                closeMobileMenu();
+              }}
+              className="w-full mt-2 bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-all"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                signIn("google");
+                closeMobileMenu();
+              }}
+              className="w-full mt-2 flex items-center justify-center bg-white text-slate-900 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-all"
+            >
+              <FaGoogle className="mr-2 text-lg" />
+              Sign In with Google
+            </button>
+          )}
+        </div>
+      </div>
+    </nav>
   );
 }
-
-
-
