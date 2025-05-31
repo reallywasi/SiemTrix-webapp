@@ -11,6 +11,8 @@
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
     "autoprefixer": "10.4.14",
+    "chart.js": "^4.4.9",
+    "chartjs": "^0.3.24",
     "codemirror": "^5.65.17",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
