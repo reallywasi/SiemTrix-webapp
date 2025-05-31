@@ -502,21 +502,18 @@
 
 
 
-"use client";
-import React, { useEffect, useRef, useState } from "react";
-import Chart from "chart.js/auto";
 
-const FocusAndDistraction = () => {
-  const distractionChartRef = useRef(null);
-  const focusBreakChartRef = useRef(null);
-  const tabActivityChartRef = useRef(null);
-  const distractionChartInstance = useRef(null);
-  const focusBreakChartInstance = useRef(null);
-  const tabActivityChartInstance = useRef(null);
+
+import React, { useEffect, useState } from 'react';
+import GraphCalculations from '@/components/graphs/GraphCalculations';
+import DistractionTimelineChart from '@/components/graphs/DistractionTimelineChart';
+import FocusDistractionChart from '@/components/graphs/FocusDistractionChart';
+
+function FocusAndDistraction() {
   const [dashboardData, setDashboardData] = useState({
-    productivityTime: "0m",
-    distractionTime: "0m",
-    focusScore: "0%",
+    productivityTime: '0m',
+    distractionTime: '0m',
+    focusScore: '0%',
     activities: [],
     distractionIntervals: [],
     timeline: [],
@@ -525,21 +522,22 @@ const FocusAndDistraction = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const today = new Date().toISOString().split('T')[0]; // 2025-06-01
         const response = await fetch(
-          "http://localhost:5000/api/logs/productivity?date=2025-05-31"
+          `http://localhost:5000/api/logs/productivity?date=${today}`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch data");
+          throw new Error('Failed to fetch data');
         }
         const data = await response.json();
+        console.log('API Response:', data);
         setDashboardData({
-          productivityTime: data.productivityTime || "0m",
-          distractionTime: data.distractionTime || "0m",
-          focusScore: data.focusScore || "0%",
+          productivityTime: data.productivityTime || '0m',
+          distractionTime: data.distractionTime || '0m',
+          focusScore: data.focusScore || '0%',
           activities: data.activities || [],
           distractionIntervals: data.distractionIntervals || [],
           timeline: data.timeline || [],
@@ -554,247 +552,6 @@ const FocusAndDistraction = () => {
     fetchData();
   }, []);
 
-  // Calculate metrics
-  const calculateMetrics = () => {
-    const totalTimeMinutes =
-      parseFloat(dashboardData.productivityTime) +
-      parseFloat(dashboardData.distractionTime);
-    const entertainmentPercentage =
-      totalTimeMinutes > 0
-        ? ((parseFloat(dashboardData.distractionTime) / totalTimeMinutes) * 100).toFixed(0)
-        : 0;
-
-    // Context switches: Count transitions between Work and Entertainment
-    let contextSwitches = 0;
-    for (let i = 1; i < dashboardData.timeline.length; i++) {
-      if (dashboardData.timeline[i].category !== dashboardData.timeline[i - 1].category) {
-        contextSwitches++;
-      }
-    }
-
-    // Tab switches: Count unique category/activity_type changes
-    let tabSwitches = 0;
-    for (let i = 1; i < dashboardData.timeline.length; i++) {
-      const current = dashboardData.timeline[i];
-      const previous = dashboardData.timeline[i - 1];
-      if (
-        current.category !== previous.category ||
-        current.activity_type !== previous.activity_type
-      ) {
-        tabSwitches++;
-      }
-    }
-    const timeframeHours = 12 / 60; // 12 minutes
-    const tabSwitchingRate = timeframeHours > 0 ? (tabSwitches / timeframeHours).toFixed(0) : 0;
-
-    // Total switches: Same as tabSwitches
-    const totalSwitches = tabSwitches;
-
-    // Peak tabs open: Estimate as number of unique categories in a short window
-    const uniqueCategories = new Set(dashboardData.timeline.map((entry) => entry.category)).size;
-
-    return {
-      entertainmentPercentage,
-      contextSwitches,
-      tabSwitchingRate,
-      totalSwitches,
-      peakTabsOpen: uniqueCategories,
-    };
-  };
-
-  // Process Distraction Timeline data
-  const processDistractionTimeline = () => {
-    if (!dashboardData.timeline.length) {
-      return { labels: [], distractionData: [] };
-    }
-
-    // Create 30-second intervals for 19:11–19:23Z
-    const startTime = new Date("2025-05-31T19:11:00Z").getTime();
-    const endTime = new Date("2025-05-31T19:23:00Z").getTime();
-    const interval = 30 * 1000; // 30 seconds
-    const labels = [];
-    const distractionData = [];
-
-    for (let time = startTime; time <= endTime; time += interval) {
-      const date = new Date(time);
-      const hours = date.getUTCHours();
-      const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-      const seconds = date.getUTCSeconds().toString().padStart(2, "0");
-      labels.push(`${hours}:${minutes}:${seconds}`);
-      distractionData.push(0);
-    }
-
-    // Assign distraction intervals to slots
-    dashboardData.distractionIntervals.forEach((interval) => {
-      const entryTime = new Date(interval.time).getTime();
-      const slotIndex = Math.floor((entryTime - startTime) / interval);
-      if (slotIndex >= 0 && slotIndex < labels.length) {
-        distractionData[slotIndex] += interval.durationMinutes;
-      }
-    });
-
-    return { labels, distractionData };
-  };
-
-  // Process Tab Activity data
-  const processTabActivity = () => {
-    if (!dashboardData.timeline.length) {
-      return { labels: [], tabSwitchData: [] };
-    }
-
-    // Create 30-second intervals
-    const startTime = new Date("2025-05-31T19:11:00Z").getTime();
-    const endTime = new Date("2025-05-31T19:23:00Z").getTime();
-    const interval = 30 * 1000;
-    const labels = [];
-    const tabSwitchData = [];
-
-    for (let time = startTime; time <= endTime; time += interval) {
-      const date = new Date(time);
-      const hours = date.getUTCHours();
-      const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-      const seconds = date.getUTCSeconds().toString().padStart(2, "0");
-      labels.push(`${hours}:${minutes}:${seconds}`);
-      tabSwitchData.push(0);
-    }
-
-    // Count switches per interval
-    for (let i = 1; i < dashboardData.timeline.length; i++) {
-      const current = dashboardData.timeline[i];
-      const previous = dashboardData.timeline[i - 1];
-      const entryTime = new Date(current.time).getTime();
-      const slotIndex = Math.floor((entryTime - startTime) / interval);
-      if (
-        slotIndex >= 0 &&
-        slotIndex < labels.length &&
-        (current.category !== previous.category ||
-          current.activity_type !== previous.activity_type)
-      ) {
-        tabSwitchData[slotIndex]++;
-      }
-    }
-
-    return { labels, tabSwitchData };
-  };
-
-  // Render Charts
-  useEffect(() => {
-    if (loading || error) return;
-
-    // Distraction Timeline Chart
-    if (distractionChartRef.current) {
-      if (distractionChartInstance.current) {
-        distractionChartInstance.current.destroy();
-      }
-      const { labels, distractionData } = processDistractionTimeline();
-      distractionChartInstance.current = new Chart(distractionChartRef.current, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Distraction Level",
-              data: distractionData,
-              borderColor: "#EF4444",
-              backgroundColor: "rgba(239, 68, 68, 0.1)",
-              tension: 0.4,
-              fill: true,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: "top" },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: Math.max(...distractionData, 1),
-            },
-            x: {
-              ticks: {
-                autoSkip: true,
-                maxTicksLimit: 10,
-              },
-            },
-          },
-        },
-      });
-    }
-
-    // Focus vs Break Cycles Chart (Placeholder)
-    if (focusBreakChartRef.current) {
-      if (focusBreakChartInstance.current) {
-        focusBreakChartInstance.current.destroy();
-      }
-      focusBreakChartInstance.current = new Chart(focusBreakChartRef.current, {
-        type: "bar",
-        data: {
-          labels: [],
-          datasets: [],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            title: { display: true, text: "No focus/break data available" },
-          },
-        },
-      });
-    }
-
-    // Browser Tab Activity Chart
-    if (tabActivityChartRef.current) {
-      if (tabActivityChartInstance.current) {
-        tabActivityChartInstance.current.destroy();
-      }
-      const { labels, tabSwitchData } = processTabActivity();
-      tabActivityChartInstance.current = new Chart(tabActivityChartRef.current, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Tab Switches",
-              data: tabSwitchData,
-              borderColor: "#10B981",
-              backgroundColor: "rgba(16, 185, 129, 0.1)",
-              tension: 0.4,
-              fill: true,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: "top" },
-          },
-          scales: {
-            y: { beginAtZero: true },
-            x: {
-              ticks: {
-                autoSkip: true,
-                maxTicksLimit: 10,
-              },
-            },
-          },
-        },
-      });
-    }
-
-    return () => {
-      if (distractionChartInstance.current) distractionChartInstance.current.destroy();
-      if (focusBreakChartInstance.current) focusBreakChartInstance.current.destroy();
-      if (tabActivityChartInstance.current) tabActivityChartInstance.current.destroy();
-    };
-  }, [dashboardData, loading, error]);
-
-  const metrics = calculateMetrics();
-
   if (loading) {
     return <div className="min-h-screen p-6 bg-gray-50">Loading...</div>;
   }
@@ -803,10 +560,11 @@ const FocusAndDistraction = () => {
     return <div className="min-h-screen p-6 bg-gray-50">Error: {error}</div>;
   }
 
+  const { metrics, distractionTimelineData } = GraphCalculations({ dashboardData });
+
   return (
     <section id="focus-distraction" className="min-h-screen p-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Focus & Distraction</h1>
           <p className="text-gray-600">Monitor distractions and optimize your focus patterns</p>
@@ -831,14 +589,13 @@ const FocusAndDistraction = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4l-8-8-10 5h12a2 2 0 002-2V7a2 0 00-2-2H5a2 0 00-2 2 v10a2 0 002 2z"
                   />
                 </svg>
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-2">{metrics.entertainmentPercentage}% of total time</p>
           </div>
-
           <div className="bg-white rounded-lg border border-gray-200/30 p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -861,9 +618,8 @@ const FocusAndDistraction = () => {
                 </svg>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">{(metrics.contextSwitches / 0.2).toFixed(1)} switches/hour</p>
+            <p className="text-xs text-gray-500 mt-2">{(metrics.contextSwitches / 8).toFixed(1)} switches/hour</p>
           </div>
-
           <div className="bg-white rounded-lg border border-gray-200/30 p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -881,19 +637,18 @@ const FocusAndDistraction = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2 v14a2 2 0 002 2z"
                   />
                 </svg>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">Limited data</p>
+            <p className="text-xs text-gray-500 mt-2">Progress</p>
           </div>
-
           <div className="bg-white rounded-lg border border-gray-200/30 p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Focus vs Break</p>
-                <p className="text-2xl font-bold text-blue-600">-</p>
+                <p className="text-sm font-medium text-gray-600">Focus vs Distraction</p>
+                <p className="text-2xl font-bold text-gray-600">-</p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <svg
@@ -906,29 +661,24 @@ const FocusAndDistraction = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002 2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
                   />
                 </svg>
               </div>
             </div>
-            <p className="text-xs text-gray-500 mt-2">No data available</p>
+            <p className="text-xs text-gray-500 mt-2">No cycle data available</p>
           </div>
         </div>
 
         {/* Charts Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <div className="bg-white rounded-lg border border-gray-200/30 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Distraction Timeline</h3>
-            <div className="h-64">
-              <canvas id="distractionTimelineChart" ref={distractionChartRef} />
-            </div>
+            <DistractionTimelineChart distractionTimelineData={distractionTimelineData} />
           </div>
-
           <div className="bg-white rounded-lg border border-gray-200/30 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Focus vs Break Cycles</h3>
-            <div className="h-64">
-              <canvas id="focusBreakChart" ref={focusBreakChartRef} />
-            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Focus and Distraction Cycles</h3>
+            <FocusDistractionChart dashboardData={dashboardData} />
           </div>
         </div>
 
@@ -936,17 +686,17 @@ const FocusAndDistraction = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div className="bg-white rounded-lg border border-gray-200/30 p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Top Distracting Websites</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Work</h3>
               <span className="text-sm text-gray-500">Today</span>
             </div>
             <div className="space-y-4">
-              {dashboardData.distractionIntervals.map((interval, index) => {
+              {dashboardData.distractionData?.map((interval, index) => {
                 const totalTimeMinutes =
-                  parseFloat(dashboardData.productivityTime) +
-                  parseFloat(dashboardData.distractionTime);
+                  parseFloat(dashboardData.productivityTime || 0) +
+                  parseFloat(dashboardData.distractionTime || 0);
                 const percentage =
                   totalTimeMinutes > 0
-                    ? ((interval.durationMinutes / totalTimeMinutes) * 100).toFixed(0)
+                    ? ((interval.durationMinutes / totalTimeMinutes) * 100).toFixed(2)
                     : 0;
                 return (
                   <div
@@ -966,9 +716,9 @@ const FocusAndDistraction = () => {
                             strokeLinejoin="round"
                             strokeWidth={2}
                             d={
-                              interval.name === "YouTube"
-                                ? "M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                : "M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              interval.name === 'YouTube'
+                                ? 'M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10 5h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'
+                                : 'M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z'
                             }
                           />
                         </svg>
@@ -985,7 +735,7 @@ const FocusAndDistraction = () => {
                   </div>
                 );
               })}
-              {dashboardData.distractionIntervals.length === 0 && (
+              {(!dashboardData.distractionData || dashboardData.distractionData.length === 0) && (
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200/30">
                   <div className="flex items-center">
                     <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center mr-3">
@@ -1012,7 +762,6 @@ const FocusAndDistraction = () => {
               )}
             </div>
           </div>
-
           <div className="bg-white rounded-lg border border-gray-200/30 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Most Frequent Context Switches</h3>
@@ -1064,9 +813,9 @@ const FocusAndDistraction = () => {
                         <div>
                           <p className="text-sm font-medium text-gray-900">{key}</p>
                           <p className="text-xs text-gray-600">
-                            {key.includes("Work") && key.includes("Entertainment")
-                              ? "Productive to distracting"
-                              : "Category switch"}
+                            {key.includes('Work') && key.includes('Entertainment')
+                              ? 'Productive to distracting'
+                              : 'Category switch'}
                           </p>
                         </div>
                       </div>
@@ -1103,60 +852,38 @@ const FocusAndDistraction = () => {
           </div>
         </div>
 
-        {/* Real-time Alerts & Browser Tab Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg border border-gray-200/30 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Real-time Distraction Alerts</h3>
-              <div className="flex items-center">
-                <div className="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
-                <span className="text-sm text-gray-600 font-medium">Inactive</span>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200/30">
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
-                  <svg
-                    className="w-4 h-4 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">No alerts available</p>
-                    <span className="text-xs text-gray-600 font-medium">-</span>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">No real-time distraction data</p>
-                </div>
-              </div>
+        {/* Real-time Alerts */}
+        <div className="bg-white rounded-lg border border-gray-200/30 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Real-time Distraction Alerts</h3>
+            <div className="flex items-center">
+              <div className="w-3 h-3 bg-gray-500 rounded-full mr-2"></div>
+              <span className="text-sm text-gray-600 font-medium">Inactive</span>
             </div>
           </div>
-
-          <div className="bg-white rounded-lg border border-gray-200/30 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Browser Tab Activity</h3>
-              <span className="text-sm text-gray-500">Last hour</span>
-            </div>
-            <div className="h-64 mb-6">
-              <canvas id="tabActivityChart" ref={tabActivityChartRef} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200/30">
-                <p className="text-2xl font-bold text-gray-900">{metrics.totalSwitches}</p>
-                <p className="text-sm text-gray-600">Total Switches</p>
+          <div className="space-y-4">
+            <div className="flex items-start p-4 bg-gray-50 rounded-lg border border-gray-200/30">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                <svg
+                  className="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
               </div>
-              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200/30">
-                <p className="text-2xl font-bold text-gray-900">{metrics.peakTabsOpen}</p>
-                <p className="text-sm text-gray-600">Peak Tabs Open</p>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-gray-900">No alerts available</p>
+                  <span className="text-xs text-gray-600 font-medium">-</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-1">No real-time distraction data</p>
               </div>
             </div>
           </div>
@@ -1164,6 +891,6 @@ const FocusAndDistraction = () => {
       </div>
     </section>
   );
-};
+}
 
 export default FocusAndDistraction;

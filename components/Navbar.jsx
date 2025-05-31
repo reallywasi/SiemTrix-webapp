@@ -29,7 +29,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white shadow-md">
+    <nav className="w-screen mx-auto px-4 sm:px-6 lg:px-8 bg-white shadow-md">
       <div className="flex justify-between items-center h-16">
         {/* Logo */}
         <div className="flex-shrink-0">
