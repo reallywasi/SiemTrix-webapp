@@ -5,7 +5,7 @@ import { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 
 export default function Navbar() {
-  const { status } = useSession();
+  const { status, data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -19,6 +19,14 @@ export default function Navbar() {
     "pricing",
     "contact",
   ];
+
+  // Function to handle sign-in with redirect
+  const handleSignIn = () => {
+    // Assuming session?.user?.id provides the user ID; adjust as needed
+    const userId = session?.user?.id || "default"; // Fallback to "default" if ID is not available
+    signIn("google", { callbackUrl: `/${userId}/dashboard` });
+    closeMobileMenu();
+  };
 
   return (
     <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white shadow-md">
@@ -54,7 +62,7 @@ export default function Navbar() {
             </button>
           ) : (
             <button
-              onClick={() => signIn("google")}
+              onClick={handleSignIn}
               className="flex items-center bg-white text-slate-900 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-all"
             >
               <FaGoogle className="mr-2 text-lg" />
@@ -112,10 +120,7 @@ export default function Navbar() {
             </button>
           ) : (
             <button
-              onClick={() => {
-                signIn("google");
-                closeMobileMenu();
-              }}
+              onClick={handleSignIn}
               className="w-full mt-2 flex items-center justify-center bg-white text-slate-900 border border-gray-300 px-4 py-2 rounded-md hover:bg-gray-100 hover:text-black transition-all"
             >
               <FaGoogle className="mr-2 text-lg" />
